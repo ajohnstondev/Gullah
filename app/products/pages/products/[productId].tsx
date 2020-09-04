@@ -7,8 +7,11 @@ import getStorefront from "app/storefronts/queries/getStorefront"
 import { Product as ProductType, Storefront, User } from "db"
 import getCurrentUser from "app/users/queries/getCurrentUser"
 
+
+
+
 type Props = {
-  product: ProductType,
+  product: string,
   storefront: Storefront,
   currentUser: User
 }
@@ -20,26 +23,24 @@ export const getServerSideProps = async ({params, req, res}) => {
     where: { id: Number(params?.productId)},
   }, {req, res})
 
-  const {createdAt, updatedAt, ...newProduct} = product
-
 
   const _storefront = await ssrQuery(getStorefront, {
     where: { id: product.storefrontId},
   }, {req, res})
 
   const currentUser = await ssrQuery(getCurrentUser, null, {req, res})
-  const {storefront, ...newUser} = currentUser
+  
 
 
   return {
     props: {
-      product: newProduct,
+      product: JSON.stringify(product),
       storefront: {
         id: _storefront.id,
         userId: _storefront.userId,
         name: _storefront.name
       },
-      currentUser: newUser
+      currentUser: JSON.stringify(currentUser)
     }
   }
 }
@@ -50,6 +51,9 @@ const ShowProductPage: BlitzPage<Props> = (props) => {
 
   const router = useRouter()
 
+  const product: ProductType = JSON.parse(props.product)
+  
+
   return (
     <div>
       <Head>
@@ -58,12 +62,12 @@ const ShowProductPage: BlitzPage<Props> = (props) => {
 
       <main>
 
-        <h1>{props.product.title}</h1>
-        <p>By: <Link href="/storefronts/[storefrontId]" as={`/storefronts/${props.storefront.id}`}><a>{props.storefront.name}</a></Link></p>
-        <p>{props.product.description}</p>
+        <h1>{product.title}</h1>
+        <p>Store: <Link href="/storefronts/[storefrontId]" as={`/storefronts/${props.storefront.id}`}><a>{props.storefront.name}</a></Link></p>
+        <p>{product.description}</p>
         {props.currentUser.id == props.storefront.userId && <>
     
-          <Link href="/products/[productId]/edit" as={`/products/${props.product.id}/edit`}>
+          <Link href="/products/[productId]/edit" as={`/products/${product.id}/edit`}>
             <a>Edit</a>
           </Link>
 
@@ -71,7 +75,7 @@ const ShowProductPage: BlitzPage<Props> = (props) => {
             type="button"
             onClick={async () => {
               if (window.confirm("This will be deleted")) {
-                await deleteProduct({ where: { id: props.product.id } })
+                await deleteProduct({ where: { id: product.id } })
                 router.push("/products")
               }
             }}

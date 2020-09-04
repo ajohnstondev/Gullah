@@ -5,10 +5,10 @@ import getStorefront from "app/storefronts/queries/getStorefront"
 import getStorefrontProducts from 'app/storefronts/queries/getStorefrontProducts'
 import deleteStorefront from "app/storefronts/mutations/deleteStorefront"
 import { useCurrentUser } from "app/hooks/useCurrentUser"
-import { StorefrontWhereInput } from "db"
+import { Storefront as StorefrontType } from "db"
 
 type Props = {
-  storefront: StorefrontWhereInput
+  storefront: string
 }
 
 const ITEMS_PER_PAGE = 1
@@ -20,13 +20,10 @@ export const getServerSideProps = async ({params, req, res}) => {
     where: { id: Number(params?.storefrontId)},
   }, {req, res})
 
-  const {createdAt, updatedAt, ...newStorefront} = storefront
-
-
 
   return {
     props: {
-      storefront: newStorefront
+      storefront: JSON.stringify(storefront)
     }
   }
 }
@@ -119,6 +116,8 @@ export const Storefront = (props) => {
 }
 
 const ShowStorefrontPage: BlitzPage<Props> = (props) => {
+  const storefront: StorefrontType = JSON.parse(props.storefront)
+
   return (
     <div>
       <Head>
@@ -126,9 +125,9 @@ const ShowStorefrontPage: BlitzPage<Props> = (props) => {
       </Head>
 
       <main>
-        <h1>... {props.storefront.name}</h1>
+        <h1>{storefront.name}</h1>
         <Suspense fallback={<div>Loading...</div>}>
-          <Storefront storefront={props.storefront}/>
+          <Storefront storefront={storefront}/>
         </Suspense>
       </main>
     </div>
