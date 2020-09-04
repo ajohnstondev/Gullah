@@ -29,10 +29,10 @@ const NewProductPage: BlitzPage = () => {
                   ...data
                 }
               })
-              alert("Success!" + JSON.stringify(product))
+              toast.success('Product created');
               router.push("/products/[productId]", `/products/${product.id}`)
             } catch (error) {
-              alert("Error creating product " + JSON.stringify(error, null, 2))
+              toast.error(error.message);
             }
           }}
         />
