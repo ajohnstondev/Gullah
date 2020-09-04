@@ -1,6 +1,6 @@
 import React, { Suspense } from "react"
 import Layout from "app/layouts/Layout"
-import { Head, Link, useRouter, useQuery, useParam, BlitzPage } from "blitz"
+import { Head, Link, useRouter, useQuery, useParam, BlitzPage, ssrQuery } from "blitz"
 import getProduct from "app/products/queries/getProduct"
 import updateProduct from "app/products/mutations/updateProduct"
 import ProductForm from "app/products/components/ProductForm"
@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import path from "path"
 import {getSessionContext} from "@blitzjs/server"
 import db from "db"
+import getStorefront from "app/storefronts/queries/getStorefront"
 
 export const EditProduct = () => {
   const router = useRouter()
@@ -84,8 +85,8 @@ export const getServerSideProps = async ({params, req, res }) => {
   if(session.userId) {
 
     const user = await db.user.findOne({where: {id: session.userId}, include: {storefront: true}})
-    const currentProduct = await db.product.findOne({where: { id: Number(params.productId)}})
-    const storefront = await db.storefront.findOne({where: {id: currentProduct?.storefrontId }})
+    const currentProduct = await ssrQuery(getProduct, {where: { id: Number(params.productId)}}, {req, res})
+    const storefront = await ssrQuery(getStorefront, {where: { id: currentProduct.storefrontId}}, {req, res})
 
     if(user && user.id !== storefront?.userId) {
       res.writeHead(302, {location: "/?authError=You don't own this product"})

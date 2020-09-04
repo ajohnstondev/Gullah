@@ -3,7 +3,7 @@ import db, { FindOneStorefrontArgs } from "db"
 
 type GetStorefrontInput = {
   where: FindOneStorefrontArgs["where"]
-  include?: FindOneStorefrontArgs['include']
+  include?: FindOneStorefrontArgs['include'],
   // Only available if a model relationship exists
   // include?: FindOneStorefrontArgs['include']
 }

@@ -1,6 +1,6 @@
 import React, { Suspense } from "react"
 import Layout from "app/layouts/Layout"
-import { Head, Link, useRouter, useQuery, useParam, BlitzPage } from "blitz"
+import { Head, Link, useRouter, useQuery, useParam, BlitzPage, ssrQuery } from "blitz"
 import getStorefront from "app/storefronts/queries/getStorefront"
 import updateStorefront from "app/storefronts/mutations/updateStorefront"
 import StorefrontForm from "app/storefronts/components/StorefrontForm"
@@ -84,7 +84,7 @@ export const getServerSideProps = async ({params, req, res }) => {
   if(session.userId) {
 
     const user = await db.user.findOne({where: {id: session.userId}, include: {storefront: true}})
-    const currentStorefront = await db.storefront.findOne({where: {id: Number(params.storefrontId) }})
+    const currentStorefront = await ssrQuery(getStorefront, {where: { id: Number(params.storefrontId)}}, {req, res})
 
     if(user && user.id !== currentStorefront?.userId) {
       res.writeHead(302, {location: "/?authError=You don't own this storefront"})

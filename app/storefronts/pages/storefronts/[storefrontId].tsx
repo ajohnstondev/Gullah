@@ -1,23 +1,42 @@
 import React, { Suspense } from "react"
 import Layout from "app/layouts/Layout"
-import { Head, Link, useRouter, Router, useQuery, usePaginatedQuery, useRouterQuery, useParam, BlitzPage } from "blitz"
+import { Head, Link, useRouter, Router, useQuery, usePaginatedQuery, useRouterQuery, ssrQuery, useParam, BlitzPage, PromiseReturnType, GetServerSideProps } from "blitz"
 import getStorefront from "app/storefronts/queries/getStorefront"
 import getStorefrontProducts from 'app/storefronts/queries/getStorefrontProducts'
 import deleteStorefront from "app/storefronts/mutations/deleteStorefront"
 import { useCurrentUser } from "app/hooks/useCurrentUser"
+import { StorefrontWhereInput } from "db"
 
+type Props = {
+  storefront: StorefrontWhereInput
+}
 
 const ITEMS_PER_PAGE = 1
 
+export const getServerSideProps = async ({params, req, res}) => {
 
-export const Storefront = () => {
+
+  const storefront = await ssrQuery(getStorefront, {
+    where: { id: Number(params?.storefrontId)},
+  }, {req, res})
+
+  const {createdAt, updatedAt, ...newStorefront} = storefront
+
+
+
+  return {
+    props: {
+      storefront: newStorefront
+    }
+  }
+}
+
+
+export const Storefront = (props) => {
   const currentUser = useCurrentUser()
   const router = useRouter()
   const storefrontId = useParam("storefrontId", "number")
-  const [storefront] = useQuery(getStorefront, { 
-    where: { id: storefrontId }, 
-    include: { products: true } 
-  })
+
 
   const {page = 0} = useRouterQuery()
 
@@ -33,7 +52,7 @@ export const Storefront = () => {
 
     const url = { pathname: '/storefronts/[storefrontId]', query };
 
-    const urlAs = { pathname: `/storefronts/${storefront.id}`, query }
+    const urlAs = { pathname: `/storefronts/${storefrontId}`, query }
 
     return router.push(url, urlAs);
   }
@@ -44,19 +63,25 @@ export const Storefront = () => {
 
     const url = { pathname: '/storefronts/[storefrontId]', query };
 
-    const urlAs = { pathname: `/storefronts/${storefront.id}`, query }
+    const urlAs = { pathname: `/storefronts/${storefrontId}`, query }
 
     return router.push(url, urlAs);
   }
 
   return (
     <div>
-      <h1>Storefront {storefront.id}</h1>
-      {/* <pre>{JSON.stringify(storefront, null, 2)}</pre> */}
-
 
       <h3>Store Products</h3>
-      <pre>{JSON.stringify(storefrontproducts, null, 2)}</pre>
+
+      {storefrontproducts.map((product, i ) => {
+        return (
+          <div>
+            <Link href="/products/[productId]" as={`/products/${product.id}`}>
+              <a>{product.title}</a>
+            </Link>
+          </div>
+        )
+      })}
       <button disabled={page == 0 || !page} onClick={goToPreviousPage}>
         Previous
       </button>
@@ -64,26 +89,28 @@ export const Storefront = () => {
         Next
       </button>
       
-
-    {currentUser?.id == storefront.userId && <>
-          <Link href="/storefronts/[storefrontId]/edit" as={`/storefronts/${storefront.id}/edit`}>
-          <a>Edit</a>
-        </Link>
-  
-        <button
-          type="button"
-          onClick={async () => {
-            if (window.confirm("This will be deleted")) {
-              await deleteStorefront({ where: { id: storefront.id } })
-              router.push("/storefronts")
-            }
-          }}
-        >
-          Delete
-        </button>
-        </>
-    }
-
+      <div>
+        <hr/>
+        {currentUser?.id == props.storefront.userId && 
+          <>
+            <Link href="/storefronts/[storefrontId]/edit" as={`/storefronts/${storefrontId}/edit`}>
+              <a>Edit</a>
+            </Link>
+      
+            <button
+              type="button"
+              onClick={async () => {
+                if (window.confirm("This will be deleted")) {
+                  await deleteStorefront({ where: { id: storefrontId } })
+                  router.push("/storefronts")
+                }
+              }}
+            >
+              Delete
+            </button>
+          </>
+        }
+      </div>
 
 
 
@@ -91,7 +118,7 @@ export const Storefront = () => {
   )
 }
 
-const ShowStorefrontPage: BlitzPage = () => {
+const ShowStorefrontPage: BlitzPage<Props> = (props) => {
   return (
     <div>
       <Head>
@@ -99,15 +126,17 @@ const ShowStorefrontPage: BlitzPage = () => {
       </Head>
 
       <main>
-
+        <h1>... {props.storefront.name}</h1>
         <Suspense fallback={<div>Loading...</div>}>
-          <Storefront />
+          <Storefront storefront={props.storefront}/>
         </Suspense>
       </main>
     </div>
   )
 }
 
+
 ShowStorefrontPage.getLayout = (page) => <Layout title={"Storefront"}>{page}</Layout>
+
 
 export default ShowStorefrontPage
