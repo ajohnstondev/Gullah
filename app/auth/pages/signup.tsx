@@ -6,6 +6,8 @@ import { LabeledTextField } from "app/components/LabeledTextField"
 import signup from "app/auth/mutations/signup"
 import { SignupInput, SignupInputType } from "app/auth/validations"
 
+
+
 const SignupPage: BlitzPage = () => {
   const router = useRouter()
 

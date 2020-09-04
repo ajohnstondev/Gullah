@@ -1,0 +1,17 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateField",
+      "model": "Storefront",
+      "field": "user",
+      "arity": "Required"
+    },
+    {
+      "tag": "UpdateField",
+      "model": "Storefront",
+      "field": "userId",
+      "arity": "Required"
+    }
+  ]
+}

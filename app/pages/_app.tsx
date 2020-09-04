@@ -1,12 +1,29 @@
+import React from 'react'
 import { AppProps, ErrorComponent } from "blitz"
 import { ErrorBoundary } from "react-error-boundary"
 import { queryCache } from "react-query"
 import LoginForm from "app/auth/components/LoginForm"
+import { ThemeProvider } from 'styled-components'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {StoreProvider } from 'app/components/Shared/StoreContext'
+
+const theme = {
+  colors: {
+    primary: '#0070f3',
+    secondary: '#0000',
+    white: '#fff'
+  },
+  sizes: {
+    maxWidth: '95%'
+  }
+}
 
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
   return (
+    
     <ErrorBoundary
       FallbackComponent={RootErrorFallback}
       onReset={() => {
@@ -15,7 +32,8 @@ export default function App({ Component, pageProps }: AppProps) {
         queryCache.resetErrorBoundaries()
       }}
     >
-      {getLayout(<Component {...pageProps} />)}
+      <ThemeProvider theme={theme}><StoreProvider>{getLayout(<><Component {...pageProps} /></>)}</StoreProvider></ThemeProvider>
+      <ToastContainer position='top-center' newestOnTop={true} limit={1} />
     </ErrorBoundary>
   )
 }

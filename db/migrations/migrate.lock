@@ -1,0 +1,7 @@
+# Prisma Migrate lockfile v1
+
+20200827131727-init
+20200831181000-added-storefronts-and-products
+20200902025920-fix-user-owns-storefront
+20200902030933-storefront-must-belong-to-user
+20200902145251-make-userid-unique-on-storefront
