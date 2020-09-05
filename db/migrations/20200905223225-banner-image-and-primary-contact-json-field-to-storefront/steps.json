@@ -1,0 +1,28 @@
+{
+  "version": "0.3.14-fixed",
+  "steps": [
+    {
+      "tag": "UpdateArgument",
+      "location": {
+        "tag": "Source",
+        "source": "db"
+      },
+      "argument": "provider",
+      "newValue": "[\"postgres\"]"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Storefront",
+      "field": "bannerImage",
+      "type": "String",
+      "arity": "Required"
+    },
+    {
+      "tag": "CreateField",
+      "model": "Storefront",
+      "field": "primaryContact",
+      "type": "Json",
+      "arity": "Required"
+    }
+  ]
+}

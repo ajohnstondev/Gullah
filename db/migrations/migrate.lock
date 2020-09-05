@@ -5,3 +5,7 @@
 20200902025920-fix-user-owns-storefront
 20200902030933-storefront-must-belong-to-user
 20200902145251-make-userid-unique-on-storefront
+20200905222108-create-categories-and-associations
+20200905223225-banner-image-and-primary-contact-json-field-to-storefront
+20200905224033-create-gallery-and-associations
+20200905224556-add-properties-to-product

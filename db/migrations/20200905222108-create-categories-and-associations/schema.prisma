@@ -2,9 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  // provider = ["sqlite", "postgres"]
-  provider = ["postgres"]
-  url      = env("DATABASE_URL")
+  provider = ["sqlite", "postgres"]
+  url = "***"
 }
 
 generator client {
@@ -48,9 +47,7 @@ model Storefront {
   products    Product[]
   user        User @relation(fields: [userId], references: [id])
   userId      Int @unique
-  categories  Category[]
-  bannerImage String
-  primaryContact Json 
+  categories  Category[] 
 }
 
 model Product {
@@ -61,9 +58,7 @@ model Product {
   description  String     
   storefront   Storefront @relation(fields: [storefrontId], references: [id])
   storefrontId Int
-  categories   Category[]
-  gallery      Gallery
-  properties   Json[]       
+  categories   Category[]        
 }
 
 model Category {
@@ -75,13 +70,4 @@ model Category {
   parentId  Int
   stores    Storefront[]
   products  Product[]
-}
-
-model Gallery {
-  id        Int      @default(autoincrement()) @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  images    String[]
-  product Product @relation(fields: [productId], references: [id])
-  productId Int 
 }
