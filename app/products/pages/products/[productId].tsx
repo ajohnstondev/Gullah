@@ -4,7 +4,7 @@ import { Head, Link, useRouter, BlitzPage, ssrQuery } from "blitz"
 import getProduct from "app/products/queries/getProduct"
 import deleteProduct from "app/products/mutations/deleteProduct"
 import getStorefront from "app/storefronts/queries/getStorefront"
-import { Product as ProductType, Storefront, User } from "db"
+import { Product as ProductType, Storefront, User, Category } from "db"
 import getCurrentUser from "app/users/queries/getCurrentUser"
 
 
@@ -13,14 +13,17 @@ import getCurrentUser from "app/users/queries/getCurrentUser"
 type Props = {
   product: string,
   storefront: Storefront,
-  currentUser: User
+  currentUser: string
 }
+
+
 
 export const getServerSideProps = async ({params, req, res}) => {
 
 
   const product = await ssrQuery(getProduct, {
     where: { id: Number(params?.productId)},
+    include: {categories: true},
   }, {req, res})
 
 
@@ -51,9 +54,16 @@ const ShowProductPage: BlitzPage<Props> = (props) => {
 
   const router = useRouter()
 
-  const product: ProductType = JSON.parse(props.product)
-  
 
+  interface ExtendedProductType extends ProductType {
+    categories: []
+  }
+  const product: ExtendedProductType = JSON.parse(props.product)
+
+
+  const currentUser: User = JSON.parse(props.currentUser)
+
+  
   return (
     <div>
       <Head>
@@ -63,9 +73,15 @@ const ShowProductPage: BlitzPage<Props> = (props) => {
       <main>
 
         <h1>{product.title}</h1>
+        {product.categories.map((cat: Category) => {
+          return (
+            <span style={{marginRight: '14px'}}>{cat.title}</span>
+          )
+        })}
+
         <p>Store: <Link href="/storefronts/[storefrontId]" as={`/storefronts/${props.storefront.id}`}><a>{props.storefront.name}</a></Link></p>
         <p>{product.description}</p>
-        {props.currentUser.id == props.storefront.userId && <>
+        {currentUser.id == props.storefront.userId && <>
     
           <Link href="/products/[productId]/edit" as={`/products/${product.id}/edit`}>
             <a>Edit</a>

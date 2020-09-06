@@ -4,7 +4,7 @@
 datasource db {
   // provider = ["sqlite", "postgres"]
   provider = ["postgres"]
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -62,7 +62,7 @@ model Product {
   storefront   Storefront @relation(fields: [storefrontId], references: [id])
   storefrontId Int
   categories   Category[]
-  gallery      Gallery?       
+  gallery      Gallery       
 }
 
 model Category {

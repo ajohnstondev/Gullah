@@ -9,3 +9,6 @@
 20200905223225-banner-image-and-primary-contact-json-field-to-storefront
 20200905224033-create-gallery-and-associations
 20200905224556-add-properties-to-product
+20200906153935-remove-properties-from-product
+20200906155341-make-parent-id-nullable-on-category
+20200906232946-make-gallery-optional-so-we-can-cascade-delete

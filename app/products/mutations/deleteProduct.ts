@@ -1,6 +1,7 @@
 import { SessionContext } from "blitz"
 import db, { ProductDeleteArgs } from "db"
 
+
 type DeleteProductInput = {
   where: ProductDeleteArgs["where"]
 }
@@ -12,11 +13,18 @@ export default async function deleteProduct(
   ctx.session!.authorize()
 
   const product = await db.product.findOne({where})
+
+
   const storefront = await db.storefront.findOne({where: {
     id: product?.storefrontId
   }})
 
   if(ctx.session!.userId == storefront?.userId) {
+
+    await db.gallery.deleteMany({where: {
+      productId: product?.id
+    }})
+
     const deletedProduct = await db.product.delete({ where })
 
     return deletedProduct

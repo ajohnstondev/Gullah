@@ -13,7 +13,7 @@ type GetStorefrontProductsInput = {
 }
 
 export default async function getStorefrontProducts(
-  { where, orderBy, cursor, take, skip /* include */ }: GetStorefrontProductsInput,
+  { where, orderBy, cursor, take, skip, include /* include */ }: GetStorefrontProductsInput,
   ctx: { session?: SessionContext } = {}
 ) {
   // ctx.session!.authorize()
@@ -28,7 +28,8 @@ export default async function getStorefrontProducts(
     },
     orderBy,
     take,
-    skip
+    skip,
+    include: {gallery: true}
   })
 
   const count = await db.product.findMany({

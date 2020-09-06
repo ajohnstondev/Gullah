@@ -4,7 +4,7 @@
 datasource db {
   // provider = ["sqlite", "postgres"]
   provider = ["postgres"]
-  url      = env("DATABASE_URL")
+  url = "***"
 }
 
 generator client {
@@ -62,7 +62,8 @@ model Product {
   storefront   Storefront @relation(fields: [storefrontId], references: [id])
   storefrontId Int
   categories   Category[]
-  gallery      Gallery?       
+  gallery      Gallery
+  // properties   Json[]       
 }
 
 model Category {
@@ -71,10 +72,12 @@ model Category {
   updatedAt DateTime @updatedAt
   title     String
   parent    Boolean
-  parentId  Int?
+  parentId  Int
   stores    Storefront[]
   products  Product[]
 }
+
+
 
 model Gallery {
   id        Int      @default(autoincrement()) @id

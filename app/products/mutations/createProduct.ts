@@ -28,7 +28,9 @@ export default async function createProduct(
     })
   
     if(!storefront) { throw new Error("Please apply for a storefront") }
-  
+
+    const incomingCategories = <[]> data.categories
+    
     const product = await db.product.create({ 
       data: {
         ...data,
@@ -36,10 +38,20 @@ export default async function createProduct(
           connect: {
             id: storefront.id
           }
+        },
+        gallery: {
+          create: {
+            images: {
+              set: []
+            }
+          }
+        },
+        categories: {
+          connect: incomingCategories?.map((cat) => {return {id: cat}})
         }
       } 
     })
-
+    
     return product
   } else {
     throw new Error('You have to be logged in')

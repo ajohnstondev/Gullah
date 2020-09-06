@@ -40,7 +40,7 @@ export const Storefront = (props) => {
   const [{storefrontproducts, hasMore}] = usePaginatedQuery(getStorefrontProducts, { 
     where: { id: storefrontId },
     skip: ITEMS_PER_PAGE * Number(page),
-    take: ITEMS_PER_PAGE,
+    take: ITEMS_PER_PAGE
   })
 
 
@@ -72,7 +72,7 @@ export const Storefront = (props) => {
 
       {storefrontproducts.map((product, i ) => {
         return (
-          <div>
+          <div key={i}>
             <Link href="/products/[productId]" as={`/products/${product.id}`}>
               <a>{product.title}</a>
             </Link>

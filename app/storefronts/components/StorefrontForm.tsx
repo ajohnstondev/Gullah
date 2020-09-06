@@ -16,6 +16,7 @@ export const StorefrontForm = (props) => {
       >
         <LabeledTextField name="name" label="Name" placeholder="Name" type="text" />
         <LabeledTextField name="description" label="Description" placeholder="Description" type="text" />
+        <LabeledTextField name="categories" label="Categories" placeholder="Categories" type="text" />
       </Form>
 
   )

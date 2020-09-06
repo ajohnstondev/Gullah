@@ -17,9 +17,16 @@ export default async function createStorefront(
     throw new Error("You already have a storefront")
   }
 
+  const incomingCategories = <[]> data.categories
+
   const storefront = await db.storefront.create({
     data: {
       ...data,
+      bannerImage: 'test',
+      primaryContact: {firstName: 'Dillon'},
+      categories: {
+        connect: incomingCategories?.map((cat) => {return {id: cat}})
+      },
       user: {
         connect: {
           id: ctx.session?.userId

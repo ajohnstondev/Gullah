@@ -1,6 +1,11 @@
 const { sessionMiddleware, unstable_simpleRolesIsAuthorized } = require("@blitzjs/server")
+const withLess = require("@zeit/next-less");
+const withCss = require('@zeit/next-css')
 
-module.exports = {
+module.exports = withLess(withCss({
+  lessLoaderOptions: {
+    javascriptEnabled: true
+  },
   middleware: [
     sessionMiddleware({
       unstable_isAuthorized: unstable_simpleRolesIsAuthorized,
@@ -14,4 +19,4 @@ module.exports = {
     return config
   },
   */
-}
+}))

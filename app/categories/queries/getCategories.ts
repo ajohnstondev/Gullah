@@ -25,5 +25,7 @@ export default async function getCategories(
     skip,
   })
 
+  console.log(categories)
+
   return categories
 }

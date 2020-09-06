@@ -23,6 +23,7 @@ const NewProductPage: BlitzPage = () => {
         <ProductForm
           initialValues={{}}
           onSubmit={async (data) => {
+
             try {
               const product = await createProduct({ 
                 data: {

@@ -27,12 +27,14 @@ const NewStorefrontPage: BlitzPage<Props> = ({children, user}) => {
         <StorefrontForm
           initialValues={{}}
           onSubmit={async (data) => {
+            const categoriesArray = await data.categories.split(',')
+            
             try {
              
               const storefront = await createStorefront({
                 data: {
                   ...data,
-                  // userId: user
+                  categories: categoriesArray.map((cat) => parseInt(cat))
                 } 
 
               })
