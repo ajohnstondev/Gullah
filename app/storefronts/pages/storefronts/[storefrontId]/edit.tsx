@@ -4,40 +4,39 @@ import { Head, Link, useRouter, useQuery, useParam, BlitzPage, ssrQuery } from "
 import getStorefront from "app/storefronts/queries/getStorefront"
 import updateStorefront from "app/storefronts/mutations/updateStorefront"
 import StorefrontForm from "app/storefronts/components/StorefrontForm"
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify"
 import path from "path"
-import {getSessionContext} from "@blitzjs/server"
+import { getSessionContext } from "@blitzjs/server"
 import db from "db"
 
 export const EditStorefront = () => {
   const router = useRouter()
   const storefrontId = useParam("storefrontId", "number")
-  const [storefront, { mutate }] = useQuery(getStorefront, { where: { id: storefrontId }, include: {categories: true} })
-  
+  const [storefront, { mutate }] = useQuery(getStorefront, {
+    where: { id: storefrontId },
+    include: { categories: true },
+  })
 
   return (
     <div>
       <h1>Edit Storefront {storefront.id}</h1>
 
-
       <StorefrontForm
-        initialValues={{...storefront}}
+        initialValues={{ ...storefront }}
         onSubmit={async (data) => {
           try {
-         
-            const {id, createdAt,userId, ...newData} = data;
-
+            const { id, createdAt, userId, ...newData } = data
             const updated = await updateStorefront({
               where: { id: storefront.id },
               data: {
-                ...newData
+                ...newData,
               },
             })
-            mutate(updated)
-            toast.success('Storefront updated');
+            await mutate(updated)
+            toast.success("Storefront updated")
             router.push("/storefronts/[storefrontId]", `/storefronts/${updated.id}`)
           } catch (error) {
-            toast.error(error.message);
+            toast.error(error.message)
           }
         }}
       />
@@ -69,38 +68,38 @@ const EditStorefrontPage: BlitzPage = () => {
 
 EditStorefrontPage.getLayout = (page) => <Layout title={"Edit Storefront"}>{page}</Layout>
 
-export const getServerSideProps = async ({params, req, res }) => {
+export const getServerSideProps = async ({ params, req, res }) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
   // https://github.com/blitz-js/blitz/issues/794
-    path.resolve("next.config.js")
-    path.resolve("blitz.config.js")
-    path.resolve(".next/__db.js")
+  path.resolve("next.config.js")
+  path.resolve("blitz.config.js")
+  path.resolve(".next/__db.js")
   // End anti-tree-shaking
-
-
 
   const session = await getSessionContext(req, res)
 
+  if (session.userId) {
+    const user = await db.user.findOne({
+      where: { id: session.userId },
+      include: { storefront: true },
+    })
+    const currentStorefront = await ssrQuery(
+      getStorefront,
+      { where: { id: Number(params.storefrontId) } },
+      { req, res }
+    )
 
-  if(session.userId) {
-
-    const user = await db.user.findOne({where: {id: session.userId}, include: {storefront: true}})
-    const currentStorefront = await ssrQuery(getStorefront, {where: { id: Number(params.storefrontId)}}, {req, res})
-
-    if(user && user.id !== currentStorefront?.userId) {
-      res.writeHead(302, {location: "/?authError=You don't own this storefront"})
+    if (user && user.id !== currentStorefront?.userId) {
+      res.writeHead(302, { location: "/?authError=You don't own this storefront" })
       res.end()
     }
 
-    return {props: {user: session.userId}}
-
+    return { props: { user: session.userId } }
   } else {
-    res.writeHead(302, {location: "/login?authError=You have to be logged in"})
+    res.writeHead(302, { location: "/login?authError=You have to be logged in" })
     res.end()
-    return {props: {}}
+    return { props: {} }
   }
-
-
 }
 
 export default EditStorefrontPage

@@ -12,19 +12,18 @@ export default async function updateStorefront(
 ) {
   ctx.session!.authorize()
 
-  const storefront = await db.storefront.findOne({where})
+  const storefront = await db.storefront.findOne({ where })
 
-  if(ctx.session!.userId == storefront?.userId) {
-    const updateStorefront = await db.storefront.update({ where, data: {
-      ...data
-    } })
+  if (ctx.session!.userId === storefront?.userId) {
+    const updateStorefront = await db.storefront.update({
+      where,
+      data: {
+        ...data,
+      },
+    })
 
     return updateStorefront
   } else {
     throw new Error("You don't own this storefront")
   }
-
-
-
-  
 }
