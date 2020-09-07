@@ -8,7 +8,6 @@ export interface DropdownSelectFieldProps extends PropsWithoutRef<JSX.IntrinsicE
   name: string
   /** Field label. */
   label: string
-
   data: {}[]
   /** Field type. Doesn't include radio buttons and checkboxes */
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
@@ -27,7 +26,6 @@ export const DropdownSelectField = React.forwardRef<HTMLInputElement, DropdownSe
       await setCategories(e)
       input.onChange(e)    
     }
-
  
     return (
       <div {...outerProps}>
