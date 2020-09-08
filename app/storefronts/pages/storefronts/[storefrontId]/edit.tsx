@@ -12,16 +12,15 @@ import db from "db"
 export const EditStorefront = () => {
   const router = useRouter()
   const storefrontId = useParam("storefrontId", "number")
-  const [storefront, { mutate }] = useQuery(getStorefront, { where: { id: storefrontId }, include: {categories: true} })
-  
+  const [storefront, { mutate }] = useQuery(getStorefront, { where: { id: storefrontId } })
 
   return (
     <div>
       <h1>Edit Storefront {storefront.id}</h1>
-
+      <pre>{JSON.stringify(storefront)}</pre>
 
       <StorefrontForm
-        initialValues={{...storefront}}
+        initialValues={storefront}
         onSubmit={async (data) => {
           try {
          
