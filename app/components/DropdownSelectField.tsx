@@ -1,4 +1,4 @@
-import React, { PropsWithoutRef } from "react"
+import React, { PropsWithoutRef, useEffect } from "react"
 import { useField } from "react-final-form"
 import { CheckTreePicker } from "rsuite"
 import "rsuite/lib/styles/index.less"
@@ -25,13 +25,17 @@ export const DropdownSelectField = React.forwardRef<HTMLInputElement, DropdownSe
       meta: { touched, error, submitError, submitting },
     } = useField(name)
 
-    // const [values, setValues] = React.useState([])
+    const [localValues, setValues] = React.useState(values)
+
+    useEffect(() => {
+      setValues(values)
+    }, [values])
 
     const handleChange = async (e: []) => {
       // console.log('event has changed: ', e)
-      // await setValues(e)
+      setValues(e)
       const connect = e.map((v) => ({ id: v }))
-      const disconnect = values.filter((v) => !e.includes(v)).map((v) => ({ id: v }))
+      const disconnect = values?.filter((v) => !e.includes(v)).map((v) => ({ id: v })) || []
 
       input.onChange({
         ...(connect.length && { connect }),
@@ -48,7 +52,7 @@ export const DropdownSelectField = React.forwardRef<HTMLInputElement, DropdownSe
             cascade={false}
             onChange={handleChange}
             ref={ref}
-            defaultValue={values}
+            value={localValues}
             disabled={submitting}
             placeholder={placeholder}
             data={data}
