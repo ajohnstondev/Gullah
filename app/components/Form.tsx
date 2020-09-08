@@ -32,7 +32,14 @@ export function Form<FormValues extends Record<string, unknown>>({
           return error.formErrors.fieldErrors
         }
       }}
-      onSubmit={onSubmit}
+      onSubmit={(values, form) => {
+        const changedValues = Object.keys(form.getState().dirtyFields).reduce(
+          (acc, key) => ({ ...acc, [key]: values[key] }),
+          {}
+        )
+
+        onSubmit(changedValues as FormValues, form)
+      }}
       render={({ handleSubmit, submitting, submitError }) => (
         <form onSubmit={handleSubmit} className="form" {...props}>
           {/* Form fields supplied as children are rendered here */}
