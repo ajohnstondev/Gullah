@@ -72,6 +72,7 @@ export const StorefrontForm = (props) => {
 
       <SingleFileUploadField name="bannerImage" label="Upload a banner image" />
 
+
     </Form>
   )
 }

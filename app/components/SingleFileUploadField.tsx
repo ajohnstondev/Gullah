@@ -55,6 +55,8 @@ const PreviewWrapper = styled.div`
   }
 `
 
+
+
 export interface SingleFileUploadFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   /** Field name. */
   name: string
@@ -72,11 +74,11 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
     } = useField(name)
 
     const [files, setFiles]: any = useState([]);
+    const [metaData, setMetaData]: any = useState({});
 
-    const { getRootProps, getInputProps } = useDropzone({
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
       accept: "image/*",
       multiple: false,
-      noDrag: true,
       onDrop: async (acceptedFiles) => {
 
         const files = acceptedFiles.map(file =>
@@ -89,8 +91,13 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
 
         if (onChange) {
+          const button = await document && document.getElementsByClassName('submitButton')[0] as HTMLButtonElement
+          button.disabled = true
           const response = await uploadSingleFile(files)
           const body = await response.json()
+          button.disabled = false
+          setMetaData(body)
+
           onChange(body);
         }
 
@@ -102,6 +109,12 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
       const newFiles = [...files];
       newFiles.splice(newFiles.indexOf(file), 1);
       setFiles(newFiles);
+      fetch('/api/removeFileupload', {
+        method: 'POST',
+        body: JSON.stringify({
+          public_id: metaData.public_id
+        })
+      })
     };
   
     const thumbs = files.map((file, i) => (
@@ -128,10 +141,13 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
             {files.length ? <>{thumbs}</> : <PreviewWrapper/>}
           
 
-            <div {...getRootProps({ className: "btn-dropzone" })}>
+            <div {...getRootProps({ className: "btn-dropzone" })} onClick={e => e.stopPropagation()}>
               <input {...getInputProps()} />
+            
               <span className="input">Drag your files here or browse to upload</span>
               <button onClick={(e) => e.preventDefault()}>Browse</button>
+       
+
             </div>
 
           </Wrapper>

@@ -51,7 +51,7 @@ export function Form<FormValues extends Record<string, unknown>>({
             </div>
           )}
 
-          <button type="submit" disabled={submitting}>
+          <button className="submitButton" type="submit" disabled={submitting}>
             {submitText}
           </button>
 
