@@ -12,3 +12,4 @@
 20200906153935-remove-properties-from-product
 20200906155341-make-parent-id-nullable-on-category
 20200906232946-make-gallery-optional-so-we-can-cascade-delete
+20200909160810-change-banner-image-to-json-type

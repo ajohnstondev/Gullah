@@ -30,6 +30,8 @@ export default async function createProduct(
     if(!storefront) { throw new Error("Please apply for a storefront") }
 
     const incomingCategories = <[]> data.categories
+
+    console.log('incoming', incomingCategories)
     
     const product = await db.product.create({ 
       data: {
@@ -45,9 +47,6 @@ export default async function createProduct(
               set: []
             }
           }
-        },
-        categories: {
-          connect: incomingCategories?.map((cat) => {return {id: cat}})
         }
       } 
     })

@@ -2,6 +2,7 @@ import React, { Suspense } from "react"
 import { LabeledTextField } from "app/components/LabeledTextField"
 import { Form } from "app/components/Form"
 import { DropdownSelectField } from "app/components/DropdownSelectField"
+import SingleFileUploadField from 'app/components/SingleFileUploadField'
 import getCategories from "app/categories/queries/getCategories"
 import { useQuery } from "blitz"
 
@@ -64,9 +65,13 @@ export const StorefrontForm = (props) => {
         placeholder="Description"
         type="text"
       />
+
       <Suspense fallback={<div>Loading...</div>}>
         <CategoryDropdown values={values} />
       </Suspense>
+
+      <SingleFileUploadField name="bannerImage" label="Upload a banner image" />
+
     </Form>
   )
 }

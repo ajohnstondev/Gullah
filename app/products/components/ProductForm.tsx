@@ -10,7 +10,7 @@ type ProductFormProps = {
   onSubmit: Function
 }
 
-const CategoryDropdown = () => {
+const CategoryDropdown = ({values}) => {
   const [category] =  useQuery(getCategories, {})
   const [newCats, setNewCats]: any  = React.useState([])
   
@@ -40,25 +40,35 @@ const CategoryDropdown = () => {
   }, [])
 
   return (
-    <DropdownSelectField name="categories" label="Categories" placeholder="Categories" data={newCats} />
+    <DropdownSelectField
+      name="categories"
+      label="Categories"
+      placeholder="Categories"
+      data={newCats}
+      values={values}
+    />
   )
 }
 
-const ProductForm = ({ initialValues, onSubmit }: ProductFormProps) => {
+const ProductForm = (props) => {
+  const {
+    initialValues: { categories },
+  } = props
+  const values = categories && categories.length ? categories.map((c) => c.id) : []
 
   return (
     <Form
     submitText="Submit"
-    initialValues={initialValues}
+    initialValues={props.initialValues}
     onSubmit={async (values, form) => {
-      await onSubmit(values)
+      await props.onSubmit(values)
       setTimeout(()=> form.reset())
     }}
   >
     <LabeledTextField name="title" label="Title" placeholder="Title" type="text" />
     <LabeledTextField name="description" label="Description" placeholder="Description" type="text" />
     <Suspense fallback={<div>Loading...</div>}>
-      <CategoryDropdown />
+      <CategoryDropdown values={values} />
     </Suspense>
     
     

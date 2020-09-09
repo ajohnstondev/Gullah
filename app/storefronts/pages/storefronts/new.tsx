@@ -27,14 +27,12 @@ const NewStorefrontPage: BlitzPage<Props> = ({children, user}) => {
         <StorefrontForm
           initialValues={{}}
           onSubmit={async (data) => {
-            const categoriesArray = await data.categories.split(',')
-            
+  
             try {
              
               const storefront = await createStorefront({
                 data: {
-                  ...data,
-                  categories: categoriesArray.map((cat) => parseInt(cat))
+                  ...data
                 } 
 
               })
@@ -44,14 +42,11 @@ const NewStorefrontPage: BlitzPage<Props> = ({children, user}) => {
               toast.error(error.message);
 
             }
+
           }}
         />
 
-        <p>
-          <Link href="/storefronts">
-            <a>Storefronts</a>
-          </Link>
-        </p>
+      
       </main>
     </div>
   )

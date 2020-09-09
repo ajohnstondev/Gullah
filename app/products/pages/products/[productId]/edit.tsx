@@ -13,12 +13,14 @@ import getStorefront from "app/storefronts/queries/getStorefront"
 export const EditProduct = () => {
   const router = useRouter()
   const productId = useParam("productId", "number")
-  const [product, { mutate }] = useQuery(getProduct, { where: { id: productId } })
+  const [product, { mutate }] = useQuery(getProduct, { 
+    where: { id: productId },
+    include: {categories: true} 
+  })
 
   return (
     <div>
       <h1>Edit Product {product.id}</h1>
-      <pre>{JSON.stringify(product)}</pre>
 
       <ProductForm
         initialValues={product}
@@ -33,7 +35,7 @@ export const EditProduct = () => {
                 ...newData
               },
             })
-            mutate(updated)
+            await mutate(updated)
             toast.success('Product updated');
             router.push("/products/[productId]", `/products/${updated.id}`)
           } catch (error) {

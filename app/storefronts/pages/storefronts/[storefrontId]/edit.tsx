@@ -7,66 +7,12 @@ import StorefrontForm from "app/storefronts/components/StorefrontForm"
 import { toast } from "react-toastify"
 import path from "path"
 import { getSessionContext } from "@blitzjs/server"
-import db from "db"
+import db, {Storefront as StorefrontType} from "db"
+import superjson from 'superjson';
 
-export const EditStorefront = () => {
-  const router = useRouter()
-  const storefrontId = useParam("storefrontId", "number")
-  const [storefront, { mutate }] = useQuery(getStorefront, {
-    where: { id: storefrontId },
-    include: { categories: true },
-  })
-
-  return (
-    <div>
-      <h1>Edit Storefront {storefront.id}</h1>
-
-      <StorefrontForm
-        initialValues={{ ...storefront }}
-        onSubmit={async (data) => {
-          try {
-            const { id, createdAt, userId, ...newData } = data
-            const updated = await updateStorefront({
-              where: { id: storefront.id },
-              data: {
-                ...newData,
-              },
-            })
-            await mutate(updated)
-            toast.success("Storefront updated")
-            router.push("/storefronts/[storefrontId]", `/storefronts/${updated.id}`)
-          } catch (error) {
-            toast.error(error.message)
-          }
-        }}
-      />
-    </div>
-  )
+type Props = {
+  storefront: string
 }
-
-const EditStorefrontPage: BlitzPage = () => {
-  return (
-    <div>
-      <Head>
-        <title>Edit Storefront</title>
-      </Head>
-
-      <main>
-        <Suspense fallback={<div>Loading...</div>}>
-          <EditStorefront />
-        </Suspense>
-
-        <p>
-          <Link href="/storefronts">
-            <a>Storefronts</a>
-          </Link>
-        </p>
-      </main>
-    </div>
-  )
-}
-
-EditStorefrontPage.getLayout = (page) => <Layout title={"Edit Storefront"}>{page}</Layout>
 
 export const getServerSideProps = async ({ params, req, res }) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -85,7 +31,7 @@ export const getServerSideProps = async ({ params, req, res }) => {
     })
     const currentStorefront = await ssrQuery(
       getStorefront,
-      { where: { id: Number(params.storefrontId) } },
+      { where: { id: Number(params.storefrontId) }, include: {categories: true} },
       { req, res }
     )
 
@@ -94,12 +40,60 @@ export const getServerSideProps = async ({ params, req, res }) => {
       res.end()
     }
 
-    return { props: { user: session.userId } }
+    return { props: { user: session.userId, storefront:superjson.stringify(currentStorefront)  } }
   } else {
     res.writeHead(302, { location: "/login?authError=You have to be logged in" })
     res.end()
     return { props: {} }
   }
 }
+
+
+const EditStorefrontPage: BlitzPage<Props> = (props) => {
+  const router = useRouter()
+  const storefront: StorefrontType = superjson.parse(props.storefront)
+
+  return (
+    <div>
+      <Head>
+        <title>Edit Storefront</title>
+      </Head>
+
+      <main>
+
+        <h1>Edit Storefront {storefront.id}</h1>
+        <StorefrontForm
+        initialValues={storefront}
+        onSubmit={async (data) => {
+      
+          try {
+            const { id, createdAt, userId, ...newData } = data
+
+            const updated = await updateStorefront({
+              where: { id: storefront.id },
+              data: {
+                ...newData,
+              },
+            })
+
+            toast.success("Storefront updated")
+            router.push("/storefronts/[storefrontId]", `/storefronts/${updated.id}`)
+          } catch (error) {
+            toast.error(error.message)
+          }
+        }}
+      />
+
+        <p>
+          <Link href="/storefronts">
+            <a>Storefronts</a>
+          </Link>
+        </p>
+      </main>
+    </div>
+  )
+}
+
+EditStorefrontPage.getLayout = (page) => <Layout title={"Edit Storefront"}>{page}</Layout>
 
 export default EditStorefrontPage

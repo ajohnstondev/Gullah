@@ -13,8 +13,10 @@ export default async function updateStorefront(
   ctx.session!.authorize()
 
   const storefront = await db.storefront.findOne({ where })
+  console.log(data.bannerImage[0])
 
   if (ctx.session!.userId === storefront?.userId) {
+
     const updateStorefront = await db.storefront.update({
       where,
       data: {

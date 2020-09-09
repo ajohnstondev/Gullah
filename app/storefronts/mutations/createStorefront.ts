@@ -1,6 +1,7 @@
 import { SessionContext } from "blitz"
 import db, { StorefrontCreateArgs } from "db"
 
+
 type CreateStorefrontInput = {
   data: StorefrontCreateArgs["data"]
 }
@@ -15,6 +16,7 @@ export default async function createStorefront(
     include: { storefront: true },
   })
 
+
   if (user?.storefront) {
     throw new Error("You already have a storefront")
   }
@@ -22,7 +24,6 @@ export default async function createStorefront(
   const storefront = await db.storefront.create({
     data: {
       ...data,
-      bannerImage: "test",
       primaryContact: { firstName: "Dillon" },
       user: {
         connect: {
