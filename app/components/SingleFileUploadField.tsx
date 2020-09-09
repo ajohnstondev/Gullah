@@ -2,6 +2,8 @@ import React, { PropsWithoutRef, useEffect, useState, useCallback } from "react"
 import { useField } from "react-final-form"
 import {useDropzone} from 'react-dropzone'
 import styled from 'styled-components'
+import uploadSingleFile from '../../utils/uploadSingleFile'
+
 
 
 const Wrapper = styled.div`
@@ -69,13 +71,13 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
       meta: { touched, error, submitError, submitting },
     } = useField(name)
 
-    const [files, setFiles] = useState([]);
+    const [files, setFiles]: any = useState([]);
 
     const { getRootProps, getInputProps } = useDropzone({
       accept: "image/*",
       multiple: false,
       noDrag: true,
-      onDrop: (acceptedFiles, e) => {
+      onDrop: async (acceptedFiles) => {
 
         const files = acceptedFiles.map(file =>
           Object.assign(file, {
@@ -87,7 +89,9 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
 
         if (onChange) {
-          onChange(files);
+          const response = await uploadSingleFile(files)
+          const body = await response.json()
+          onChange(body);
         }
 
       }
@@ -100,8 +104,8 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
       setFiles(newFiles);
     };
   
-    const thumbs = files.map(file => (
-      <PreviewWrapper image={file.preview}>
+    const thumbs = files.map((file, i) => (
+      <PreviewWrapper key={i} image={file.preview}>
         <button onClick={removeFile(file)}>X</button>
       </PreviewWrapper>
     ));
