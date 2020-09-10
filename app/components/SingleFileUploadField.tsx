@@ -3,6 +3,7 @@ import { useField } from "react-final-form"
 import {useDropzone} from 'react-dropzone'
 import styled from 'styled-components'
 import uploadSingleFile from '../../utils/uploadSingleFile'
+import removeFileupload from 'app/images/mutations/removeFileupload'
 
 
 
@@ -96,13 +97,8 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
         if (onChange) {
 
           if(metaData && metaData.public_id) {
-            fetch('/api/removeFileupload', {
-              method: 'POST',
-              body: JSON.stringify({
-                public_id: metaData.public_id
-              })
-            })
-          }
+            removeFileupload(metaData.public_id)
+          } 
 
 
           const button = await document && document.getElementsByClassName('submitButton')[0] as HTMLButtonElement
@@ -128,12 +124,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
       }
 
 
-      fetch('/api/removeFileupload', {
-        method: 'POST',
-        body: JSON.stringify({
-          public_id: metaData.public_id
-        })
-      })
+      removeFileupload(metaData.public_id)
     };
 
 

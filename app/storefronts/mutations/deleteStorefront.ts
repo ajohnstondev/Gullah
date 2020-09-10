@@ -1,5 +1,6 @@
 import { SessionContext } from "blitz"
 import db, { StorefrontDeleteArgs } from "db"
+import removeFileupload from 'app/images/mutations/removeFileupload'
 
 type DeleteStorefrontInput = {
   where: StorefrontDeleteArgs["where"]
@@ -19,12 +20,7 @@ export default async function deleteStorefront(
 
     if(storefront?.bannerImage?.public_id) {
       try {
-        fetch(`${process.env.API_URL}/api/removeFileupload`, {
-          method: 'POST',
-          body: JSON.stringify({
-            public_id: storefront.bannerImage.public_id
-          })
-        })
+        removeFileupload(storefront?.bannerImage?.public_id, ctx)
       } catch(err) {
         console.log(err)
       }
