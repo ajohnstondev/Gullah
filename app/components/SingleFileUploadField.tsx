@@ -96,19 +96,23 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
         if (onChange) {
 
-          if(metaData && metaData.public_id) {
-            removeFileupload(metaData.public_id)
-          } 
+          //If editing a storefront, and there are initial values - remove the file without uploading the new one straight away
+          if(initialValue) {
+            onChange(files)
+          } else {
+
+            const button = await document && document.getElementsByClassName('submitButton')[0] as HTMLButtonElement
+            button.disabled = true
+            const response = await uploadSingleFile(files)
+            const body = await response.json()
+            button.disabled = false
+            setMetaData(body)
+  
+            onChange(body);
+          }
 
 
-          const button = await document && document.getElementsByClassName('submitButton')[0] as HTMLButtonElement
-          button.disabled = true
-          const response = await uploadSingleFile(files)
-          const body = await response.json()
-          button.disabled = false
-          setMetaData(body)
 
-          onChange(body);
         }
 
       }

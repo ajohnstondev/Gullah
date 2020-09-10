@@ -9,6 +9,8 @@ import path from "path"
 import { getSessionContext } from "@blitzjs/server"
 import db, {Storefront as StorefrontType} from "db"
 import superjson from 'superjson';
+import removeFileupload from 'app/images/mutations/removeFileupload'
+import uploadSingleFile from '../../../../../utils/uploadSingleFile'
 
 type Props = {
   storefront: string
@@ -69,10 +71,15 @@ const EditStorefrontPage: BlitzPage<Props> = (props) => {
           try {
             const { id, createdAt, userId, ...newData } = data
 
+            await removeFileupload(storefront.bannerImage.public_id)
+            const response = await uploadSingleFile(data.bannerImage)
+            const body = await response.json()
+
             const updated = await updateStorefront({
               where: { id: storefront.id },
               data: {
                 ...newData,
+                bannerImage: {...body}
               },
             })
 
