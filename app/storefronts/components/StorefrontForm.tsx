@@ -45,7 +45,7 @@ const CategoryDropdown = ({ values }) => {
 
 export const StorefrontForm = (props) => {
   const {
-    initialValues: { categories },
+    initialValues: { categories, bannerImage },
   } = props
   const values = categories && categories.length ? categories.map((c) => c.id) : []
 
@@ -70,7 +70,7 @@ export const StorefrontForm = (props) => {
         <CategoryDropdown values={values} />
       </Suspense>
 
-      <SingleFileUploadField name="bannerImage" label="Upload a banner image" />
+      <SingleFileUploadField name="bannerImage" label="Upload a banner image" initialValue={bannerImage} />
 
 
     </Form>

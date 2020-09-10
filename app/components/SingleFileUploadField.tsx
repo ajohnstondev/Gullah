@@ -62,21 +62,24 @@ export interface SingleFileUploadFieldProps extends PropsWithoutRef<JSX.Intrinsi
   name: string
   /** Field label. */
   label: string
+
+  initialValue: any
   /** Field type. Doesn't include radio buttons and checkboxes */
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadFieldProps>(
-  ({ name, label, outerProps, placeholder, ...props }, ref) => {
+  ({ name, label, outerProps, placeholder,initialValue, ...props }, ref) => {
     const {
       input: {value, onChange, ...input},
       meta: { touched, error, submitError, submitting },
     } = useField(name)
 
     const [files, setFiles]: any = useState([]);
-    const [metaData, setMetaData]: any = useState({});
+    const [metaData, setMetaData]: any = useState(initialValue ? {...initialValue} : {});
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+
+    const { getRootProps, getInputProps } = useDropzone({
       accept: "image/*",
       multiple: false,
       onDrop: async (acceptedFiles) => {
@@ -91,6 +94,17 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
 
         if (onChange) {
+
+          if(metaData && metaData.public_id) {
+            fetch('/api/removeFileupload', {
+              method: 'POST',
+              body: JSON.stringify({
+                public_id: metaData.public_id
+              })
+            })
+          }
+
+
           const button = await document && document.getElementsByClassName('submitButton')[0] as HTMLButtonElement
           button.disabled = true
           const response = await uploadSingleFile(files)
@@ -106,9 +120,14 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
     const removeFile = file => (e) => {
       e.preventDefault()
-      const newFiles = [...files];
-      newFiles.splice(newFiles.indexOf(file), 1);
-      setFiles(newFiles);
+
+      if(files) {
+        const newFiles = [...files];
+        newFiles.splice(newFiles.indexOf(file), 1);
+        setFiles(newFiles);
+      }
+
+
       fetch('/api/removeFileupload', {
         method: 'POST',
         body: JSON.stringify({
@@ -116,6 +135,8 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
         })
       })
     };
+
+
   
     const thumbs = files.map((file, i) => (
       <PreviewWrapper key={i} image={file.preview}>
@@ -130,6 +151,10 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
       },
       [files]
     );
+
+    useEffect(() => {
+      setMetaData(initialValue)
+    }, [])
   
 
     return (
@@ -138,8 +163,11 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
           {label}
 
           <Wrapper>
-            {files.length ? <>{thumbs}</> : <PreviewWrapper/>}
-          
+            {files.length ? <>{thumbs}</> : null}
+            {!files.length && !metaData && <PreviewWrapper />}
+            {!files.length && metaData && <PreviewWrapper image={metaData.secure_url}/>}
+           
+
 
             <div {...getRootProps({ className: "btn-dropzone" })} onClick={e => e.stopPropagation()}>
               <input {...getInputProps()} />
