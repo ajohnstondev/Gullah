@@ -9,6 +9,15 @@ This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
 Run your app in the development mode.
 
 ```
+settle .env
+```
+
+```
+install global prisma cli
+migrate database
+```
+
+```
 blitz start
 ```
 
